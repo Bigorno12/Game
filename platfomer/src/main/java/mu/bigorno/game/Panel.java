@@ -10,24 +10,20 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.stream.IntStream;
 
-import static mu.bigorno.enumeration.Player.IDLE;
-import static mu.bigorno.enumeration.Player.RUNNING;
-import static mu.bigorno.utils.Directions.DOWN;
-import static mu.bigorno.utils.Directions.LEFT;
-import static mu.bigorno.utils.Directions.RIGHT;
-import static mu.bigorno.utils.Directions.UP;
+import static mu.bigorno.utils.Directions.*;
+import static mu.bigorno.utils.PlayerConstants.*;
 import static mu.bigorno.utils.ReadFile.importSpecificImageRegion;
 
 @Slf4j
 public class Panel extends JPanel {
 
-    private static final int WIDTH = 128;
-    private static final int HEIGHT = 80;
+    private static final int WIDTH = 256;
+    private static final int HEIGHT = 160;
     private static final int DIMENSION_WIDTH = 1280;
     private static final int DIMENSION_HEIGHT = 800;
     private static final int RECTANGLE_X = 64;
     private static final int RECTANGLE_Y = 40;
-    private static final String path = "C:/Workspace/game/platfomer/src/main/resources/picture/player_sprites.png";
+    private static final String PATH = "C:/Workspace/game/platfomer/src/main/resources/picture/player_sprites.png";
 
     private float xDelta = 100;
     private float yDelta = 100;
@@ -36,15 +32,17 @@ public class Panel extends JPanel {
     private boolean moving = false;
 
     private BufferedImage[][] animations;
-    private int playerDirection = -1;
-    private int playerAction = IDLE.getValue();
-    private int animationTick, animationSpeed, animationIndex = 15;
-
+    private int playerDir = -1;
+    private int playerAction = IDLE;
+    private int aniTick, aniIndex, aniSpeed = 25;
 
     public Panel() {
-        Mouse mouse = new Mouse(this);
-        loadAnimation();
+        initializePanel();
+    }
 
+    private void initializePanel() {
+        Mouse mouse = new Mouse(this);
+        loadAnimations();
         setPanelSize();
         addKeyListener(new Keyboard(this));
         addMouseListener(mouse);
@@ -52,24 +50,20 @@ public class Panel extends JPanel {
     }
 
     @Override
-    public void paintComponent(Graphics graphics) {
+    protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
-
-        updateAnimation();
-        setAnimation();
-        updatePost();
-
-        graphics.drawImage(animations[playerAction][animationIndex], (int) xDelta, (int) yDelta, WIDTH, HEIGHT, null);
+        graphics.drawImage(animations[playerAction][aniIndex], (int) xDelta, (int) yDelta, WIDTH, HEIGHT, null);
     }
 
-    public void setRectPos(int x, int y) {
-        this.xDelta = x;
-        this.yDelta = y;
+    public void updateGame() {
+        updateAnimation();
+        setAnimation();
+        updatePosition();
     }
 
     public void setDirection(int direction) {
-        this.playerDirection = direction;
-        this.moving = true;
+        this.playerDir = direction;
+        moving = true;
     }
 
     private void setPanelSize() {
@@ -77,42 +71,41 @@ public class Panel extends JPanel {
         setPreferredSize(dimension);
     }
 
-    private void loadAnimation() {
+    private void loadAnimations() {
         animations = IntStream.range(0, 9)
                 .mapToObj(j -> IntStream.range(0, 6)
-                        .mapToObj(i -> importSpecificImageRegion(path, i * RECTANGLE_X, j * RECTANGLE_Y))
+                        .mapToObj(i -> importSpecificImageRegion(PATH, i * RECTANGLE_X, j * RECTANGLE_Y))
                         .toArray(BufferedImage[]::new))
                 .toArray(BufferedImage[][]::new);
     }
 
     private void setAnimation() {
-        if (moving) {
-            playerAction = RUNNING.getValue();
-        } else {
-            playerAction = IDLE.getValue();
-        }
+        playerAction = moving ? RUNNING : IDLE;
     }
 
     private void updateAnimation() {
-        animationTick++;
-        if (animationTick >= animationSpeed) {
-            animationTick = 0;
-            animationIndex++;
-            if (animationIndex >= animations[playerAction].length) {
-                animationIndex = 0;
+        aniTick++;
+        if (aniTick >= aniSpeed) {
+            aniTick = 0;
+            aniIndex++;
+            if (aniIndex >= sprintingAmount(playerAction)) {
+                aniIndex = 0;
             }
         }
     }
 
-    private void updatePost() {
+    private void updatePosition() {
         if (moving) {
-            switch (playerDirection) {
-                case LEFT -> xDelta -= 5;
-                case UP -> yDelta -= 5;
-                case RIGHT -> xDelta += 5;
-                case DOWN -> yDelta += 5;
-            }
+            xDelta += switch (playerDir) {
+                case LEFT -> -5;
+                case RIGHT -> 5;
+                default -> 0;
+            };
+            yDelta += switch (playerDir) {
+                case UP -> -5;
+                case DOWN -> 5;
+                default -> 0;
+            };
         }
     }
-
 }

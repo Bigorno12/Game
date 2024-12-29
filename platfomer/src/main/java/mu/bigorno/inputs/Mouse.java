@@ -40,6 +40,6 @@ public record Mouse(Panel panel) implements MouseListener, MouseMotionListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        panel.setRectPos(e.getX(), e.getY());
+
     }
 }
