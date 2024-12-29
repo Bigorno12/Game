@@ -23,8 +23,4 @@ public record Window(JFrame jFrame) {
         jFrame.add(panel);
         jFrame.pack();
     }
-
-    public Window(){
-        this(new Panel());
-    }
 }

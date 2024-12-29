@@ -5,14 +5,12 @@ public record Platform(Window window, Panel panel) implements Runnable {
     private static final int FPS = 120;
 
     public Platform {
-        panel = new Panel();
-        window = new Window(panel);
         panel.requestFocus();
         startGameLoop();
     }
 
     public Platform() {
-        this(new Window(), new Panel());
+        this(new Window(new Panel()), new Panel());
     }
 
     private void startGameLoop() {
