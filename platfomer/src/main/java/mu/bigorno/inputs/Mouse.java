@@ -11,6 +11,8 @@ import java.awt.event.MouseMotionListener;
 public record Mouse(Panel panel) implements MouseListener, MouseMotionListener {
     @Override
     public void mouseClicked(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1)
+            panel.getPlayer().setAttacking(true);
     }
 
     @Override

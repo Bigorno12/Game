@@ -1,10 +1,12 @@
 package mu.bigorno.game;
 
+import lombok.extern.slf4j.Slf4j;
+import mu.bigorno.entity.Player;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
+@Slf4j
 public class Platform {
 
     private static final int FPS = 120;
@@ -12,13 +14,17 @@ public class Platform {
 
     private final Window window;
     private final Panel panel;
-    private final ScheduledExecutorService executorService;
+    private final Player player;
 
     public Platform() {
-        this.panel = new Panel();
+        this.player = new Player(200, 200);
+        this.panel = new Panel(this.player);
         this.window = new Window(panel);
-        this.executorService = Executors.newScheduledThreadPool(2);
         initializePlatform();
+    }
+
+    public void update() {
+        player.updateGame();
     }
 
     private void initializePlatform() {
@@ -27,15 +33,49 @@ public class Platform {
     }
 
     private void startGameLoop() {
-        long framePeriod = 1000000000L / FPS;
-        long updatePeriod = 1000000000L / UPS_SET;
+        double framePeriod = 1000000000.0 / FPS;
+        double updatePeriod = 1000000000.0 / UPS_SET;
 
-        executorService.scheduleAtFixedRate(this::update, 0, updatePeriod, NANOSECONDS);
-        executorService.scheduleAtFixedRate(panel::repaint, 0, framePeriod, NANOSECONDS);
+        final long[] previousTime = {System.nanoTime()};
+
+        final int[] frames = {0};
+        final int[] updates = {0};
+        final long[] lastCheck = {System.currentTimeMillis()};
+
+        final double[] deltaU = {0};
+        final double[] deltaF = {0};
+
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            executor.submit(() -> {
+                while (true) {
+                    long currentTime = System.nanoTime();
+
+                    deltaU[0] += (currentTime - previousTime[0]) / framePeriod;
+                    deltaF[0] += (currentTime - previousTime[0]) / updatePeriod;
+                    previousTime[0] = currentTime;
+
+                    if (deltaU[0] >= 1) {
+                        update();
+                        updates[0]++;
+                        deltaU[0]--;
+                    }
+
+                    if (deltaF[0] >= 1) {
+                        panel.repaint();
+                        frames[0]++;
+                        deltaF[0]--;
+                    }
+
+                    if (System.currentTimeMillis() - lastCheck[0] >= 1000) {
+                        lastCheck[0] = System.currentTimeMillis();
+                        log.info("FPS: {} | UPS: {}", frames[0], updates[0]);
+                        frames[0] = 0;
+                        updates[0] = 0;
+
+                    }
+                }
+            });
+
+        }
     }
-
-    public void update() {
-        panel.updateGame();
-    }
-
 }
