@@ -27,6 +27,7 @@ public class Platform {
     }
 
     private void initializePlatform() {
+        player.loadLevelData(levelManager.levelOne().levelData());
         panel.requestFocus();
         startGameLoop();
     }

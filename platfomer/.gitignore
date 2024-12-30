@@ -48,7 +48,4 @@ bin/
 /gradlew.bat
 /.idea/misc.xml
 /settings.gradle
-/.idea/vcs.xml
-/.idea/workspace.xml
-/.idea/git_toolbox_prj.xml
-/.idea/shelf/Changes.xml
+/.idea/*
