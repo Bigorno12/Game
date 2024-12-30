@@ -21,4 +21,12 @@ public class ReadFile {
             throw new ImageException("Error while importing image");
         }
     }
+
+    public static BufferedImage importImage(String path) {
+        try {
+            return ImageIO.read(new File(path));
+        } catch (Exception e) {
+            throw new ImageException("Error while importing image");
+        }
+    }
 }

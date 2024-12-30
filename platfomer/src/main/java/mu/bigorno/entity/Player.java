@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.stream.IntStream;
 
+import static mu.bigorno.enumeration.Paths.CHARACTER;
 import static mu.bigorno.utils.PlayerConstants.ATTACK_1;
 import static mu.bigorno.utils.PlayerConstants.IDLE;
 import static mu.bigorno.utils.PlayerConstants.RUNNING;
@@ -19,9 +20,6 @@ public class Player extends Pair {
 
     private static final int RECTANGLE_X = 64;
     private static final int RECTANGLE_Y = 40;
-    private static final int WIDTH = 256;
-    private static final int HEIGHT = 160;
-    private static final String PATH = "C:/Workspace/game/platfomer/src/main/resources/picture/player_sprites.png";
 
     private boolean left;
     private boolean up;
@@ -36,13 +34,13 @@ public class Player extends Pair {
 
     private BufferedImage[][] animations;
 
-    public Player(float x, float y) {
-        super(x, y);
+    public Player(float x, float y, int width, int height) {
+        super(x, y, width, height);
         loadAnimations();
     }
 
     public void renderGraphic(Graphics graphics) {
-        graphics.drawImage(animations[playerAction][aniIndex], (int) getX(), (int) getY(), WIDTH, HEIGHT, null);
+        graphics.drawImage(animations[playerAction][aniIndex], (int) getX(), (int) getY(), width, height, null);
     }
 
     public void updateGame() {
@@ -62,7 +60,7 @@ public class Player extends Pair {
     private void loadAnimations() {
         animations = IntStream.range(0, 9)
                 .mapToObj(j -> IntStream.range(0, 6)
-                        .mapToObj(i -> importSpecificImageRegion(PATH, i * RECTANGLE_X, j * RECTANGLE_Y))
+                        .mapToObj(i -> importSpecificImageRegion(CHARACTER.getPath(), i * RECTANGLE_X, j * RECTANGLE_Y))
                         .toArray(BufferedImage[]::new))
                 .toArray(BufferedImage[][]::new);
     }

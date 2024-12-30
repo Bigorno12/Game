@@ -2,29 +2,28 @@ package mu.bigorno.game;
 
 import lombok.extern.slf4j.Slf4j;
 import mu.bigorno.entity.Player;
+import mu.bigorno.levels.LevelManager;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 @Slf4j
 public class Platform {
 
     private static final int FPS = 120;
+    public final static float SCALE = 2f;
     private static final int UPS_SET = 200;
 
     private final Window window;
     private final Panel panel;
     private final Player player;
+    private final LevelManager levelManager;
 
     public Platform() {
-        this.player = new Player(200, 200);
-        this.panel = new Panel(this.player);
+        this.levelManager = new LevelManager(this);
+        this.player = new Player(200, 200, (int) (64 * SCALE), (int) (40 * SCALE));
+        this.panel = new Panel(this.player, this.levelManager);
         this.window = new Window(panel);
         initializePlatform();
-    }
-
-    public void update() {
-        player.updateGame();
     }
 
     private void initializePlatform() {
@@ -55,7 +54,7 @@ public class Platform {
                     previousTime[0] = currentTime;
 
                     if (deltaU[0] >= 1) {
-                        update();
+                        player.updateGame();
                         updates[0]++;
                         deltaU[0]--;
                     }

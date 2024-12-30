@@ -5,26 +5,29 @@ import lombok.extern.slf4j.Slf4j;
 import mu.bigorno.entity.Player;
 import mu.bigorno.inputs.Keyboard;
 import mu.bigorno.inputs.Mouse;
+import mu.bigorno.levels.LevelManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.stream.IntStream;
 
 @Slf4j
 @Getter
 public class Panel extends JPanel {
 
-    private static final int WIDTH = 20;
-    private static final int HEIGHT = 20;
-    private static final int DIMENSION_WIDTH = 1280;
-    private static final int DIMENSION_HEIGHT = 800;
-    private static final int RECTANGLE_X = 64;
-    private static final int RECTANGLE_Y = 40;
+    public final static float SCALE = 2f;
+    public final static int TILES_IN_WIDTH = 26;
+    public final static int TILES_IN_HEIGHT = 14;
+    public final static int TILES_DEFAULT_SIZE = 32;
+    public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
+    public final static int GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
+    public final static int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
 
     private final Player player;
+    private final LevelManager levelManager;
 
-    public Panel(Player player) {
+    public Panel(Player player, LevelManager levelManager) {
         this.player = player;
+        this.levelManager = levelManager;
         Mouse mouse = new Mouse(this);
 
         setPanelSize();
@@ -37,16 +40,12 @@ public class Panel extends JPanel {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
 
-        graphics.setColor(Color.white);
-        IntStream.range(0, RECTANGLE_X)
-                .forEach(i -> IntStream.range(0, RECTANGLE_Y)
-                        .forEach(j -> graphics.fillRect(i * WIDTH, j * HEIGHT, WIDTH, HEIGHT))
-                );
+        levelManager.draw(graphics);
         player.renderGraphic(graphics);
     }
 
     private void setPanelSize() {
-        Dimension size = new Dimension(DIMENSION_WIDTH, DIMENSION_HEIGHT);
+        Dimension size = new Dimension(GAME_WIDTH, GAME_HEIGHT);
         setPreferredSize(size);
     }
 }
