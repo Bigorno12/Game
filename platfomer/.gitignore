@@ -42,8 +42,6 @@ bin/
 .DS_Store
 /.idea/git_toolbox_blame.xml
 /.idea/gradle.xml
-/gradle/wrapper/gradle-wrapper.jar
-/gradle/wrapper/gradle-wrapper.properties
 /gradlew
 /gradlew.bat
 /.idea/misc.xml
